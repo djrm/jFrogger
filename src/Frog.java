@@ -4,11 +4,11 @@
  *  EMAIL: danielramirezz123@gmail.com
  *  FECHA: Tue Oct 11 2011
  *  
- *  DESCRIPCION: clase para p*cman 
+ *  DESCRIPCION: clase para la rana
  *----------------------------------------------------------------------
  */
 
-import java.awt.Color;
+import java.awt.Color; // <- descartable
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.RenderingHints;
@@ -16,19 +16,23 @@ import java.awt.RenderingHints;
 
 public class Frog extends Actor {
     public int x, y;               // coordenadas
-    public int dx, dy;             // distancia de desplazamiento
+    public int dx, dy;             // distancia al origen
     private int direction;         // direccion de la rana
     private boolean walking;       // false si esta estatico 
+
+    /* descartable si se usan imagenes */
     private Color color;           // color de la rana
 
 
+    /** Constructor basico.  (x, y)  son las coordenadas 
+        de inicio de la rana */
     public Frog(int x, int y, Color color) {
         this.x = x;
         this.y = y;
         this.dx = 0;
         this.dy = 0;
 
-        this.color = color;
+        this.color = color; // <- descartable
         this.ancho = 100;
         this.alto = 100;
         this.walking = false;
@@ -36,13 +40,15 @@ public class Frog extends Actor {
         this.direction = 90;
     }
 
+    /** Constructor con tamaño.  (x, y)  son las coordenadas 
+        de inicio de la rana, lado el tamaño de un lado de la rana */
     public Frog(int x, int y, int lado, Color color) {
         this.x = x;
         this.y = y;
         this.dx = 0;
         this.dy = 0;
 
-        this.color = color;
+        this.color = color; // <- descartable
         this.ancho = Math.abs(lado);
         this.alto = Math.abs(lado);
         this.walking = false;
@@ -53,12 +59,14 @@ public class Frog extends Actor {
     
 
     /*  --M E T O D O S--  */
+    /** Dibuja a la rana */
     public void live(Graphics2D graph) {
         graph.setColor(this.color);
 
         /* frog */
     }
 
+    /** Accion para el movimiento de la rana */
     public void move() {
         this.x += this.dx;
         this.y += this.dy;

@@ -9,11 +9,15 @@
  */
 
 public class Map {
-    public MapElement [][] map;  // tablero.
-    public int height;           // alto.
-    public int width;            // ancho.
+    public MapElement [][] map;     // tablero.
 
-    public int sectionSide;      // tamaño de la seccion en px.
+    private Actor [][] actorLayer;  // capa para los actores
+    private Actor [][] pLayer;      // capa del jugador
+
+    public int height;              // alto.
+    public int width;               // ancho.
+
+    public int sectionSide;         // tamaño de la seccion en px.
 
     
 

@@ -18,9 +18,10 @@ abstract class Actor extends MapElement {
      *  player
      *  enemy
      *  dynamic
+     *  null
      */
     public String property;
-
+    
 
     /*  --M E T O D O S--  */
 

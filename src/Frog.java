@@ -16,19 +16,22 @@ import java.awt.RenderingHints;
 
 public class Frog extends Actor {
     public int x, y;               // coordenadas
-    public int dx, dy;             // distancia al origen
+    public int dx, dy;             // distancia al origen <- descartable
     private int direction;         // direccion de la rana
     private boolean walking;       // false si esta estatico 
+
+    public int score;              // puntuacion de la rana
+    public boolean alive;          // true si esta vivo
 
     /* descartable si se usan imagenes */
     private Color color;           // color de la rana
 
 
-    /** Constructor basico.  (x, y)  son las coordenadas 
+    /** Constructor basico.  (y, x)  son las coordenadas en el tablero
         de inicio de la rana */
-    public Frog(int x, int y, Color color) {
-        this.x = x;
-        this.y = y;
+    public Frog(int y, int x, Color color) {
+        this.x = Math.abs(x * 100);
+        this.y = Math.abs(y * 100);
         this.dx = 0;
         this.dy = 0;
 
@@ -37,14 +40,17 @@ public class Frog extends Actor {
         this.alto = 100;
         this.walking = false;
 
+        this.alive = true;
+        this.score = 0;
+
         this.direction = 90;
     }
 
-    /** Constructor con tamaño.  (x, y)  son las coordenadas 
+    /** Constructor con tamaño.  (y, x)  son las coordenadas 
         de inicio de la rana, lado el tamaño de un lado de la rana */
-    public Frog(int x, int y, int lado, Color color) {
-        this.x = x;
-        this.y = y;
+    public Frog(int y, int x, int lado, Color color) {
+        this.x = Math.abs(x * side);
+        this.y = Math.abs(y * side);
         this.dx = 0;
         this.dy = 0;
 
@@ -53,24 +59,30 @@ public class Frog extends Actor {
         this.alto = Math.abs(lado);
         this.walking = false;
 
+        this.alive = true;
+        this.score = 0;
+
         this.direction = 90;
     }
 
     
 
     /*  --M E T O D O S--  */
+
     /** Dibuja a la rana */
-    public void live(Graphics2D graph) {
+    public void live(Graphics2D g2d) {
         graph.setColor(this.color);
 
         /* frog */
+        // temporalmente sera un rectangulo
+        g2d.fillRect(this.x, this.y, this.width, this.height);
+               
     }
 
     /** Accion para el movimiento de la rana */
     public void move() {
-        this.x += this.dx;
-        this.y += this.dy;
-
+        this.x += this.dx * this.width;
+        this.y += this.dy * this.height;
 
     }
 
@@ -79,18 +91,22 @@ public class Frog extends Actor {
 
         if (key == KeyEvent.VK_LEFT) {
             this.dx = -1;
+            this.dy = 0;
             this.direction = 180;
         }
         else if (key == KeyEvent.VK_RIGHT) {
             this.dx = 1;
+            this.dy = 0;
             this.direction = 0;
         }
         else if (key == KeyEvent.VK_DOWN) {
             this.dy = 1;
+            this.dx = 0;
             this.direction = 270;
         }
         else if (key == KeyEvent.VK_UP) {
             this.dy = -1;
+            this.dx = 0;
             this.direction = 90;
         }
     }

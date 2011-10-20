@@ -14,10 +14,11 @@ import java.awt.Graphics2D;
 abstract class Section extends MapElement {
     public int side;   // probablemente descaratable.
 
-    /*  propiedades :
+    /*  propiedades para super.property
      *  collider
      *  ghost
      *  killer
+     *  null
      */
-    public String property;
+
 }

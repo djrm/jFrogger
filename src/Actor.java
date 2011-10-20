@@ -11,16 +11,15 @@
 import java.awt.Graphics2D;
 
 abstract class Actor extends MapElement {
-    public int width;   // ancho del actor
-    public int height;  // alto del acto
+    public int width;   // ancho del actor en px.
+    public int height;  // alto del acto en px.
 
-    /*  propiedades:
+    /*  propiedades para super.property
      *  player
      *  enemy
      *  dynamic
      *  null
      */
-    public String property;
     
 
     /*  --M E T O D O S--  */

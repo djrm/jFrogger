@@ -8,12 +8,14 @@
  *----------------------------------------------------------------------
  */
 
+import java.awt.Graphics2D;
+
 public class NullActor extends Actor {
 
-    /* recibe las coordenadas (y , x) ene medida del tablero */    
+    /* recibe las coordenadas (y , x) en medida del tablero */    
     public NullActor(int y, int x, int side) {
-        this.x = x * side;
-        this.y = y * side;
+        this.x = x * side;  // la cantidad en pixeles.
+        this.y = y * side;  // la cantidad en pixeles.
         this.width = side;
         this.height = side;
 
@@ -25,5 +27,5 @@ public class NullActor extends Actor {
     /*  --M E T O D O S--  */
     
     public void move() { /* mueve nada */ }
-    public void draw() { /* dibuja nada*/ }
+    public void draw(Graphics2D g2d) { /* dibuja nada*/ }
 }

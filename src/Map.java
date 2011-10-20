@@ -15,6 +15,8 @@
  *----------------------------------------------------------------------
  */
 
+import java.awt.Graphics2D;
+
 public class Map {
     public MapElement [][] map;     // tablero.
 
@@ -29,21 +31,21 @@ public class Map {
     
 
     /** Construye un tablero rectangular */
-    public Map(int height, int widht, int sectionSide) {
+    public Map(int height, int width, int sectionSide) {
         this.height = height;
-        this.widht = widht;
+        this.width = width;
         this.sectionSide = sectionSide;
 
-        this.map = new MapElement [widht][height];
+        this.map = new MapElement [height][width];
 
-        this.actorLayer = new Actor [widht][height];
-        this.pLayer = new Actor [widht][height];
+        this.actorLayer = new Actor [height][width];
+        this.pLayer = new Actor [height][width];
 
         /* llenamos el tablero con vacio (Empty class) 
          * Empty class o NullActor class
          */
-        for (int i = 0; i < this.width; i++)
-            for (int j = 0; j < this.height; j++) {
+        for (int i = 0; i < this.height; i++)
+            for (int j = 0; j < this.width; j++) {
                 this.map[i][j] = new Empty(i, j, this.sectionSide);
                 
                 this.actorLayer[i][j] = this.pLayer[i][j] = 
@@ -54,22 +56,22 @@ public class Map {
     /** Construye un tablero cuadrado */
     public Map(int side, int sectionSide) {
         this.height = side;
-        this.widht = side;
+        this.width = side;
         this.sectionSide = sectionSide;
 
-        this.map = new map[widht][height];
+        this.map = new MapElement [height][width];
 
-        this.actorLayer = new Actor [widht][height];
-        this.pLayer = new Actor [widht][height];
+        this.actorLayer = new Actor [height][width];
+        this.pLayer = new Actor [height][width];
 
         /* llenamos el tablero con vacio (Empty class) 
          * Empty class o NullActor class
          */
-        for (int i = 0; i < this.width; i++)
-            for (int j = 0; j < this.height; j++) {
+        for (int i = 0; i < this.height; i++)
+            for (int j = 0; j < this.width; j++) {
                 this.map[i][j] = new Empty(i, j, this.sectionSide);
 
-                this.aLayer[i][j] = this.pLayer[i][j] = 
+                this.actorLayer[i][j] = this.pLayer[i][j] = 
                     new NullActor(i, j, this.sectionSide);
             }                           
     }
@@ -80,8 +82,9 @@ public class Map {
 
     /** Dibuja todas las secciones del mapa */
     public void draw(Graphics2D g2d) {
-        for (int i = 0; i < this.width; i++)
-            for (int j = 0; j < this.height; j++) {
+        for (int i = 0; i < this.height; i++)
+            for (int j = 0; j < this.width; j++) {
+
                 this.map[i][j].draw(g2d);
                 this.actorLayer[i][j].draw(g2d);
                 this.pLayer[i][j].draw(g2d);
@@ -91,12 +94,11 @@ public class Map {
 
     /** Agrega un actor en la casilla (y , x) del tablero */
     public void addActor(Actor actor) {
-        /* la posicion en y del tablero para el nuevo elemento*/
-        int y = actor.height / this.sectionSide;
+        /* (y , x) del tablero para el nuevo elemento */
+        int y = actor.y / this.sectionSide;
+        int x = actor.x / this.sectionSide;
 
-        for (int i = actor.x / this.sectionSide; 
-             i < actor.width / this.sectionSide; i++) {
-
+        for (int i = x; i < actor.width / this.sectionSide; i++) {
             this.actorLayer[y][i] = actor;
         }
     }
@@ -110,13 +112,21 @@ public class Map {
     }
     
     /** Devuelve lo que hay en la seccion (y , x) del tablero */
-    public Section whatsIn(int y, int x) {
-        return this.map[y][x];
+    public MapElement whatsIn(int y, int x) {
+        if (pLayer[y][x].property.equals("player")) {
+            return this.pLayer[y][x];
+        }
+        else if (!actorLayer[y][x].property.equals("null")) {
+            return this.actorLayer[y][x];
+        }
+        else {
+            return this.map[y][x];
+        }
     }
 
     /** Reubica a los actores en el tablero 'actorLayer'.
      *  Esta funcion verifica si aun es vigente que un actor
-     *  tenga posecion de una casilla del tablero, y de no serlo
+     *  tenga posesion de una casilla del tablero, y de no serlo
      *  reasignara las casillas correspondientes al actor.
      */
     public void checkActors() {
@@ -124,9 +134,10 @@ public class Map {
         int tail = current.x + current.width / this.sectionSide;
         int limit = this.sectionSide / 3;
 
-        for (int i = 0; i < this.width; i++)
-            for (int j = 0; j < this.height; j++) {
-                if (!this.actorLayer[i][j] instanceof nullActor) {
+        for (int i = 0; i < this.height; i++)
+            for (int j = 0; j < this.width; j++) {
+
+                if (!(this.actorLayer[i][j] instanceof NullActor)) {
                     current = this.actorLayer[i][j];
 
                     /* calcula el actor actual y la posicion en
@@ -150,7 +161,7 @@ public class Map {
 
                     /* desplazamiento hacia la izquierda */
                     if (current.x < (j - 1) * this.sectionSide) {
-                        Actor N = new nullActor(i, tail, sectionSide);
+                        Actor N = new NullActor(i, tail, sectionSide);
 
                         this.actorLayer[i][j - 1] = current;
                         this.actorLayer[i][tail] = N;
@@ -158,7 +169,7 @@ public class Map {
 
                     /* desplazamiento hacia la derecha */
                     else if (current.x > limit * 2) {
-                        Actor N = new nullActor(i, tail, sectionSide);
+                        Actor N = new NullActor(i, tail, sectionSide);
 
                         this.actorLayer[i][j] = N;
                         this.actorLayer[i][tail + 1] = current;
@@ -189,7 +200,17 @@ public class Map {
 
         int y = actor.y / this.sectionSide;
         int x = actor.x / this.sectionSide;
-        Actor N = new nullActor(y, x, this.sectionSide);
+        Actor N = new NullActor(y, x, this.sectionSide);
+
+        /* chequeo de los limites del mapa */
+        if (y + newY == this.height) {
+            actor.y -= actor.height;
+            newY = 0;
+        }
+        else if (x + newX == this.width || x + newX == -1) {
+            return false;
+        }
+
 
         if (actor.property.equals("player")) {
             this.pLayer[y][x] = N;
@@ -205,7 +226,7 @@ public class Map {
         x = actor.x / this.sectionSide;
 
         if (actor.property.equals("player")) {
-            if (this.actorLayer[y][x] instanceof nullActor) {
+            if (this.actorLayer[y][x] instanceof NullActor) {
                 if (this.map[y][x].property.equals("killer"))
                     return false;
             }        
@@ -215,7 +236,7 @@ public class Map {
             }
         }
         /* si un actor mata a un jugador */
-        else {            
+        else if (actor.property.equals("killer")) {            
             for (int i = x; i < actor.width; i++)
                 if (this.pLayer[y][i].property.equals("player"))
                     return false;

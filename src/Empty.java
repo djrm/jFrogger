@@ -25,5 +25,5 @@ public class Empty extends Section {
     
 
     /*  --M E T O D O S--  */
-    public void draw(Graphics2D graph) {/* dibuja vacio */}
+    public void draw(Graphics2D g2d) {/* dibuja vacio */}
 }

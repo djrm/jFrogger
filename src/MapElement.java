@@ -11,10 +11,12 @@
 import java.awt.Graphics2D;
 
 abstract class MapElement {
-    public int x;  // coordenada x del elemento.
-    public int y;  // coordenada y del elemento.
+    public int x;  // coordenada x del elemento en px.
+    public int y;  // coordenada y del elemento en px.
 
-    /* propiedad que identifica a el elemento */
+    /* propiedad que identifica a el elemento 
+     * 'ver propiedades disponibles en las subclases'
+     */
     public String property;
     
 

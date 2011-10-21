@@ -83,11 +83,13 @@ public class Map {
     /** Dibuja todas las secciones del mapa */
     public void draw(Graphics2D g2d) {
         for (int i = 0; i < this.height; i++)
-            for (int j = 0; j < this.width; j++) {
-
+            for (int j = 0; j < this.width; j++)
                 this.map[i][j].draw(g2d);
+
+        for (int i = 0; i < this.height; i++)
+            for (int j = 0; j < this.width; j++) {
                 this.actorLayer[i][j].draw(g2d);
-                this.pLayer[i][j].draw(g2d);
+                this.pLayer[i][j].draw(g2d);                
             }
                     
     }
@@ -97,10 +99,27 @@ public class Map {
         /* (y , x) del tablero para el nuevo elemento */
         int y = actor.y / this.sectionSide;
         int x = actor.x / this.sectionSide;
+        int w = actor.width / this.sectionSide;
 
-        for (int i = x; i < actor.width / this.sectionSide; i++) {
-            this.actorLayer[y][i] = actor;
+        /* indice fuera de rango en x */
+        /*
+        if (x + w <= this.width) {
+            x = 0;
+            w = 0;
         }
+        else if (x + w > this.width) {
+            w = this.width - (x + w);
+        }
+        else if (x > this.width) {
+            x = 0;
+            w = 0;
+        }
+        */
+        int i = x;
+        do {
+            this.actorLayer[y][i] = actor;
+            i++;
+        } while (i < x + w);
     }
 
     /** Agrega un jugador al tablero de jugadores */
@@ -138,7 +157,10 @@ public class Map {
             for (int j = 0; j < this.width; j++) {
 
                 if (!(this.actorLayer[i][j] instanceof NullActor)) {
+                    Actor N = new NullActor(i, tail, sectionSide);
                     current = this.actorLayer[i][j];
+                    
+                    current.move();
 
                     /* calcula el actor actual y la posicion en
                      * en el tablero de su longitud. Este solo es el
@@ -152,30 +174,32 @@ public class Map {
                         current.x += this.width * sectionSide;
                         current.width += current.x;
                     }
-                    else if (current.x + current.width > 
-                             this.width * sectionSide) {
-                        current.x -= (this.width * sectionSide);
-                        current.width -= current.x;
+                    else if (current.x + current.width >=
+                             this.width * this.sectionSide) {
+                        //current.x -= (this.width * sectionSide);
+                        //current.width -= current.x;
+                        current.x = 0;
+                        this.actorLayer[i][j] = N;
+                        this.actorLayer[i][0] = current;
+                        continue;
                     }
                     
 
                     /* desplazamiento hacia la izquierda */
-                    if (current.x < (j - 1) * this.sectionSide) {
-                        Actor N = new NullActor(i, tail, sectionSide);
-
+                    if (current.x < (j - 1) * this.sectionSide + limit) {
                         this.actorLayer[i][j - 1] = current;
                         this.actorLayer[i][tail] = N;
                     }
 
                     /* desplazamiento hacia la derecha */
-                    else if (current.x > limit * 2) {
-                        Actor N = new NullActor(i, tail, sectionSide);
+                    else if (current.x + current.width > 
+                             (j + 1) * this.sectionSide + limit) {
 
                         this.actorLayer[i][j] = N;
-                        this.actorLayer[i][tail + 1] = current;
+                        this.actorLayer[i][tail % sectionSide] = current;
                     }
 
-                    /* falta una implementacion como esta pero 
+                    /*  falta una implementacion como esta pero 
                      *  para un actor que se desplaza en y 
                      */
 
@@ -196,8 +220,6 @@ public class Map {
      *  actor.
      */
     public boolean checkMovement(Actor actor, int newY, int newX) {
-        checkActors();
-
         int y = actor.y / this.sectionSide;
         int x = actor.x / this.sectionSide;
         Actor N = new NullActor(y, x, this.sectionSide);

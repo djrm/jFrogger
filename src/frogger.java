@@ -66,8 +66,19 @@ public class frogger extends JPanel implements ActionListener {
         this.level = new Map(13, 700 / 25, 25);
 	this.froggy = new Frog(12, 9, 25);
 
-        /* agrega a el jugador al tablero */
+        /* agrega a el jugador y actores al tablero */
         this.level.addPlayer(this.froggy);
+
+        for (int i = 0; i < 19; i += 6) {
+            this.level.addActor(new Racer(7, i, 25, 1, 5, "red"));
+            this.level.addActor(new Racer(11, i + 1, 25, 1, 1, "red"));
+        }
+
+        this.level.addActor(new Racer(9, 3, 25, 1, 8, "blue"));
+        this.level.addActor(new Racer(9, 12, 25, 1, 8, "blue"));
+        this.level.addActor(new Racer(9, 20, 25, 1, 8, "blue"));
+
+        this.level.addActor(new Truck(8, 3, 25, -1, 4));
 
         /* construccion del mapa */
         /* lago y carretera */
@@ -96,11 +107,11 @@ public class frogger extends JPanel implements ActionListener {
             sequencer = MidiSystem.getSequencer();
             sequencer.open();
             sequencer.setSequence(intro);
-            sequencer.start();
+            //sequencer.start();
         } catch (IOException e) {
         } catch (MidiUnavailableException e) {
         } catch (InvalidMidiDataException e) {
-        }       
+        }
     }
 
 
@@ -150,6 +161,8 @@ public class frogger extends JPanel implements ActionListener {
     }
     
     public void actionPerformed(ActionEvent e) {
+        this.level.checkActors();
+
         this.froggy.alive = 
             this.level.checkMovement(froggy, froggy.dy, froggy.dx);
 

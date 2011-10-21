@@ -21,7 +21,7 @@ public class Road extends Section {
         this.side = side;
 
         this.property = new String("ghost");
-        this.color = Color.BLACK;
+        this.color = Color.GRAY;
     }
 
 

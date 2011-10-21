@@ -9,10 +9,20 @@
  */
 
 import java.awt.Graphics2D;
-import java.awt.Color;
+import java.awt.Image;
+import java.awt.image.ImageObserver;
+import javax.swing.ImageIcon;
 
-public class Water extends Section {
-    Color color;
+
+public class Water extends Section implements ImageObserver {
+    private boolean moving;      // movimiento.
+    private byte cycle;          // contador de cambio de movimiento
+    private Image img;           // imagen actual
+
+    private static Image water2 = 
+        new ImageIcon("img/Water2.png").getImage();
+    private static Image water1 = 
+        new ImageIcon("img/Water1.png").getImage();
 
 
     public Water(int y, int x, int side) {
@@ -21,16 +31,30 @@ public class Water extends Section {
         this.side = side;
 
         this.property = new String("killer");
-        this.color = Color.BLUE;
+        this.moving = false;
+        this.cycle = 0;
     }
 
 
 
     /*  --M E T O D O S--  */
     public void draw(Graphics2D g2d) {
-        g2d.setColor(this.color);
+        if (this.moving)  img = water2;
+        else  img = water1;
+
+        g2d.drawImage(this.img, this.x, this.y, this);
         
-        /* provisionalmente sera un cuadro azul */
-        g2d.fillRect(this.x, this.y, this.side, this.side);
+        this.cycle++;
+        if (this.cycle == 10) {
+            this.moving = !this.moving;
+            this.cycle = 0;
+        }
+
     }
+
+    public boolean imageUpdate(Image img, int infoFlags, int x, int y,
+                               int width, int height) {
+        return true;
+    }
+
 }

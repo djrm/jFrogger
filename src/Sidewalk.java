@@ -19,9 +19,8 @@ public class Sidewalk extends Section {
         this.x = x * side;
         this.y = y * side;
         this.side = side;
-
         this.property = new String("ghost");
-        this.color = new Color(93, 0, 184);
+        this.color = new Color(245, 147, 0);
     }
 
 

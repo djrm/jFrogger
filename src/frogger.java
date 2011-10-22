@@ -78,7 +78,7 @@ public class frogger extends JPanel implements ActionListener {
         this.level.addActor(new Racer(9, 12, 25, 1, 8, "blue"));
         this.level.addActor(new Racer(9, 20, 25, 1, 8, "blue"));
 
-        this.level.addActor(new Truck(8, 3, 25, -1, 4));
+        this.level.addActor(new Truck(8, 3, 25, 1, 4));
 
         /* construccion del mapa */
         /* lago y carretera */

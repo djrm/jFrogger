@@ -173,6 +173,11 @@ public class Map {
                     if (current.x < 0) {
                         current.x += this.width * sectionSide;
                         current.width += current.x;
+                        //current.x = (this.width * sectionSide) - 2;
+                        //this.actorLayer[i][j] = N;
+                        //this.actorLayer[i][this.width] = current;
+                        //continue;
+
                     }
                     else if (current.x + current.width >=
                              this.width * this.sectionSide) {

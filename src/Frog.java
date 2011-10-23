@@ -21,7 +21,6 @@ public class Frog extends Actor implements ImageObserver {
     public int score;              // puntuacion de la rana
     public boolean alive;          // true si esta vivo
     public byte lives;             // las vidas de la rana
-    private int direction;         // direccion de la rana
     private boolean walking;       // false si esta estatico 
     private Image img;             // imagen para la rana
 
@@ -48,6 +47,7 @@ public class Frog extends Actor implements ImageObserver {
         this.lives = 3;
         this.property = new String("player");
         this.direction = 90;
+        this.speed = 0;
         this.img = frogStatic;
     }
    
@@ -81,6 +81,8 @@ public class Frog extends Actor implements ImageObserver {
     public void move() {
         this.x += this.dx * this.width;
         this.y += this.dy * this.height;
+        
+        this.x += this.speed;
     }
 
     public void keyPressed(KeyEvent e) {
@@ -99,11 +101,13 @@ public class Frog extends Actor implements ImageObserver {
         else if (key == KeyEvent.VK_DOWN) {
             this.dy = 1;
             this.dx = 0;
+            this.speed = 0;
             this.direction = 270;
         }
         else if (key == KeyEvent.VK_UP) {
             this.dy = -1;
             this.dx = 0;
+            this.speed = 0;
             this.direction = 90;
         }
 

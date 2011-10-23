@@ -15,8 +15,6 @@ import javax.swing.ImageIcon;
 
 
 public class Racer extends Actor implements ImageObserver {
-    private int direction;     // -1 left  ,  1 right    
-    private int speed;         // velocidad del auto.
     private Image img;
 
     private static Image car1 = 

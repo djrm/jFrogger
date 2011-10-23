@@ -11,13 +11,13 @@
 import java.awt.Graphics2D;
 
 public class NullActor extends Actor {
-
     /* recibe las coordenadas (y , x) en medida del tablero */    
     public NullActor(int y, int x, int side) {
         this.x = x * side;  // la cantidad en pixeles.
         this.y = y * side;  // la cantidad en pixeles.
         this.width = side;
         this.height = side;
+        this.speed = 0;
 
         this.property = new String("null");
     }

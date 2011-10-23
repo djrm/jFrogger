@@ -16,16 +16,14 @@
  */
 
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 public class Map {
     public MapElement [][] map;     // tablero.
-
-    private Actor [][] actorLayer;  // capa para los actores
     private Actor [][] pLayer;      // capa del jugador
-
+    private ArrayList <Actor> actorList;
     public int height;              // alto.
     public int width;               // ancho.
-
     public int sectionSide;         // tamaño de la seccion en px.
 
     
@@ -35,11 +33,9 @@ public class Map {
         this.height = height;
         this.width = width;
         this.sectionSide = sectionSide;
-
         this.map = new MapElement [height][width];
-
-        this.actorLayer = new Actor [height][width];
         this.pLayer = new Actor [height][width];
+        this.actorList = new ArrayList <Actor>();
 
         /* llenamos el tablero con vacio (Empty class) 
          * Empty class o NullActor class
@@ -48,7 +44,7 @@ public class Map {
             for (int j = 0; j < this.width; j++) {
                 this.map[i][j] = new Empty(i, j, this.sectionSide);
                 
-                this.actorLayer[i][j] = this.pLayer[i][j] = 
+                this.pLayer[i][j] = 
                     new NullActor(i, j, this.sectionSide);
             }
     }
@@ -58,11 +54,9 @@ public class Map {
         this.height = side;
         this.width = side;
         this.sectionSide = sectionSide;
-
         this.map = new MapElement [height][width];
-
-        this.actorLayer = new Actor [height][width];
         this.pLayer = new Actor [height][width];
+        this.actorList = new ArrayList <Actor>();
 
         /* llenamos el tablero con vacio (Empty class) 
          * Empty class o NullActor class
@@ -71,7 +65,7 @@ public class Map {
             for (int j = 0; j < this.width; j++) {
                 this.map[i][j] = new Empty(i, j, this.sectionSide);
 
-                this.actorLayer[i][j] = this.pLayer[i][j] = 
+                this.pLayer[i][j] = 
                     new NullActor(i, j, this.sectionSide);
             }                           
     }
@@ -86,47 +80,26 @@ public class Map {
             for (int j = 0; j < this.width; j++)
                 this.map[i][j].draw(g2d);
 
+        for (int i = 0; i < this.actorList.size(); i++)
+            this.actorList.get(i).draw(g2d);
+
         for (int i = 0; i < this.height; i++)
-            for (int j = 0; j < this.width; j++) {
-                this.actorLayer[i][j].draw(g2d);
+            for (int j = 0; j < this.width; j++)
                 this.pLayer[i][j].draw(g2d);                
-            }
                     
     }
 
     /** Agrega un actor en la casilla (y , x) del tablero */
     public void addActor(Actor actor) {
-        /* (y , x) del tablero para el nuevo elemento */
-        int y = actor.y / this.sectionSide;
-        int x = actor.x / this.sectionSide;
-        int w = actor.width / this.sectionSide;
+        this.actorList.add(actor);
 
-        /* indice fuera de rango en x */
-        /*
-        if (x + w <= this.width) {
-            x = 0;
-            w = 0;
-        }
-        else if (x + w > this.width) {
-            w = this.width - (x + w);
-        }
-        else if (x > this.width) {
-            x = 0;
-            w = 0;
-        }
-        */
-        int i = x;
-        do {
-            this.actorLayer[y][i] = actor;
-            i++;
-        } while (i < x + w);
     }
 
     /** Agrega un jugador al tablero de jugadores */
     public void addPlayer(Actor player) {
         int y = player.y / this.sectionSide;
         int x = player.x / this.sectionSide;
-            
+        
         this.pLayer[y][x] = player;
     }
     
@@ -135,89 +108,63 @@ public class Map {
         if (pLayer[y][x].property.equals("player")) {
             return this.pLayer[y][x];
         }
-        else if (!actorLayer[y][x].property.equals("null")) {
-            return this.actorLayer[y][x];
-        }
         else {
             return this.map[y][x];
         }
     }
 
-    /** Reubica a los actores en el tablero 'actorLayer'.
-     *  Esta funcion verifica si aun es vigente que un actor
-     *  tenga posesion de una casilla del tablero, y de no serlo
-     *  reasignara las casillas correspondientes al actor.
+    /** Verifica si el jugador tiene una collision con un actor.
+     *  Retornara 
+     *  0 si no la tuvo.
+     *  1 si collisiono y debe morir
+     *  2 si esta sobre un actor no asesino
      */
-    public void checkActors() {
-        Actor current = this.actorLayer[0][0];
-        int tail = current.x + current.width / this.sectionSide;
-        int limit = this.sectionSide / 3;
+    public int checkCollision(Actor player) {
+        int tolerance = this.sectionSide / 4;
 
-        for (int i = 0; i < this.height; i++)
-            for (int j = 0; j < this.width; j++) {
+        for (int i = 0; i < this.actorList.size(); i++) {
+            Actor current = this.actorList.get(i);
 
-                if (!(this.actorLayer[i][j] instanceof NullActor)) {
-                    Actor N = new NullActor(i, tail, sectionSide);
-                    current = this.actorLayer[i][j];
+            if (player.y == current.y) {
+                if (player.x >= current.x - tolerance && player.x < 
+                    current.x + current.width + tolerance &&
+                    player.y == current.y || 
+                    (player.x + player.width >= current.x + tolerance &&
+                     player.x + player.width < current.x + current.width)) {
+
+                    if (current.property.equals("enemy"))
+                        return 1;
                     
-                    current.move();
+                    if (current.property.equals("dynamic")) {
+                        player.speed = current.speed * current.direction;
 
-                    /* calcula el actor actual y la posicion en
-                     * en el tablero de su longitud. Este solo es el
-                     * caso para un actor con desplazamiento en x.
-                     */                    
-                    tail = (current.x + current.width) / sectionSide;
-
-                    /* en caso de que el objeto se salga de los 
-                     * limites */
-                    if (current.x < 0) {
-                        current.x += this.width * sectionSide;
-                        current.width += current.x;
-                        //current.x = (this.width * sectionSide) - 2;
-                        //this.actorLayer[i][j] = N;
-                        //this.actorLayer[i][this.width] = current;
-                        //continue;
-
+                        return 2;
                     }
-                    else if (current.x + current.width >=
-                             this.width * this.sectionSide) {
-                        //current.x -= (this.width * sectionSide);
-                        //current.width -= current.x;
-                        current.x = 0;
-                        this.actorLayer[i][j] = N;
-                        this.actorLayer[i][0] = current;
-                        continue;
-                    }
-                    
-
-                    /* desplazamiento hacia la izquierda */
-                    if (current.x < (j - 1) * this.sectionSide + limit) {
-                        this.actorLayer[i][j - 1] = current;
-                        this.actorLayer[i][tail] = N;
-                    }
-
-                    /* desplazamiento hacia la derecha */
-                    else if (current.x + current.width > 
-                             (j + 1) * this.sectionSide + limit) {
-
-                        this.actorLayer[i][j] = N;
-                        this.actorLayer[i][tail % sectionSide] = current;
-                    }
-
-                    /*  falta una implementacion como esta pero 
-                     *  para un actor que se desplaza en y 
-                     */
-
-
-                    /*
-                    if (tail > this.width)
-                        break;
-                    
-                    j = tail;
-                    */
-                }
+                }                    
             }
+        }
+        player.speed = 0;
+        return 0;
+    }                   
+
+    /** Mueve a los actores */
+    public void moveActors() {
+        for (int i = 0; i < this.actorList.size(); i++) {
+            Actor current = this.actorList.get(i);
+
+            if (current.x > this.width * this.sectionSide && 
+                current.direction == 1)
+                current.x = -current.width;
+
+            else if (current.x + current.width 
+                     < 0 && current.direction == -1)
+                current.x = this.width * this.sectionSide + current.width;
+                                        
+            current.move();
+            
+        }
     }
+
 
     /** Valida el movimiento de un actor. Retornara 1 siempre 
      *  y cuando no haya ocurrido un siniestro.
@@ -228,38 +175,42 @@ public class Map {
         int y = actor.y / this.sectionSide;
         int x = actor.x / this.sectionSide;
         Actor N = new NullActor(y, x, this.sectionSide);
+        int tolerance = this.sectionSide / 4;
+        int collision;
+
+        moveActors();
 
         /* chequeo de los limites del mapa */
         if (y + newY == this.height) {
             actor.y -= actor.height;
             newY = 0;
+            return true;
         }
         else if (x + newX == this.width || x + newX == -1) {
             return false;
         }
 
+        if (this.map[y + newY][x].property.equals("collider"))
+          return false;
 
         if (actor.property.equals("player")) {
             this.pLayer[y][x] = N;
             this.pLayer[y + newY][x + newX] = actor;
         }
-        else {
-            this.actorLayer[y][x] = N;
-            this.actorLayer[y + newY][x + newX] = actor;
-        }
+
 
         /* chequeo de desgracias */
         y = actor.y / this.sectionSide;
         x = actor.x / this.sectionSide;
 
         if (actor.property.equals("player")) {
-            if (this.actorLayer[y][x] instanceof NullActor) {
+            collision = checkCollision(actor);
+            if (collision == 0) {
                 if (this.map[y][x].property.equals("killer"))
                     return false;
-            }        
-            else {
-                if (this.actorLayer[y][x].property.equals("enemy"))
-                    return false;
+            }
+            else if (collision == 1) {
+                return false;
             }
         }
         /* si un actor mata a un jugador */

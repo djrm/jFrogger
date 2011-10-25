@@ -22,13 +22,13 @@ import javax.swing.JFrame;
 import java.util.Scanner;
 
 /* sonido */
+import java.io.File;
+import java.io.IOException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
-import java.io.File;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
-import java.io.IOException;
 
 
 public class frogger extends JPanel implements ActionListener {
@@ -36,7 +36,6 @@ public class frogger extends JPanel implements ActionListener {
     private Map level;    // nivel.
     private int timeL;    // tiempo de juego.
     private int speed;    // dificultad del juego.
-
     private Timer timer;
     
     /* sonido */
@@ -58,55 +57,48 @@ public class frogger extends JPanel implements ActionListener {
 
 
     public frogger() {
-	addKeyListener(new TAdapter());
-	setFocusable(true);
-	setDoubleBuffered(true);
+        addKeyListener(new TAdapter());
+        setFocusable(true);
+        setDoubleBuffered(true);
         setBackground(Color.BLACK);
-
         this.speed = 1;
 
         /* inicializacion del mapa y rana */
         this.level = new Map(13, 700 / 25, 25);
-	this.froggy = new Frog(12, 9, 25);
+        this.froggy = new Frog(12, 9, 25);
 
         /* agrega a el jugador y actores al tablero */
         this.level.addPlayer(this.froggy);
-
+        this.level.addActor(new SheFrog(3, 0, 25, 1, 1 + speed));
         for (int i = 0; i < 25; i += 6) {
             level.addActor(new Racer(7, i, 25, 1, 3 + speed, "red"));
             level.addActor(new Racer(11, i + 3, 25, 1, 1 + speed, "red"));
         }
         for (int i = 0; i < 20; i += 9)
             level.addActor(new Racer(9, i, 25, 1, 5 + speed, "blue"));
-
         for (int i = 0; i < 21; i += 10)  {
             level.addActor(new Truck(8, i, 25, -1, 2 + speed));
             level.addActor(new Truck(10, i + 4, 25, -1, 1 + speed));
         }
-
         for (int i = 0; i < 27; i += 7) 
             level.addActor(new Tree(4, i, 25, "small", 1, 4 + speed));
-
         for (int i = 0; i < 25; i += 8) 
             level.addActor(new Tree(1, i, 25, "mid", 1, 2 + speed));
-
         level.addActor(new Tree(3, 0, 25, "big", 1, 1 + speed));
         level.addActor(new Tree(3, 12, 25, "big", 1, 1 + speed));
-        level.addActor(new Tree(3, 24, 25, "big", 1, 1 + speed));
-        
+        level.addActor(new Tree(3, 24, 25, "big", 1, 1 + speed));        
         boolean t = true;
         for (int i = 0; i < 31; i += 6) {
             level.addActor(new Turtles(5, i, 25, 3, -1, 1 + speed, t));
             t = !t;
         }
-
         for (int i = 0; i < 29; i += 4) {
             level.addActor(new Turtles(2, i, 25, 2, -1, 1 + speed, t));
             t = !t;
         }
 
         /* construccion del mapa */
-        /* lago y carretera */
+        /* rio y carretera */
         for (int i = 1; i < 6; i++)
             for (int j = 0; j < this.level.width; j++) {
                 this.level.map[i][j] = new Water(i, j, 25);
@@ -118,7 +110,7 @@ public class frogger extends JPanel implements ActionListener {
             this.level.map[12][j] = new Sidewalk(12, j, 25);
         }                        
 
-        this.timeL = 600 - speed * 4;   // timepo de juego.
+        this.timeL = 600 - speed * 4;  // timepo de juego.
 
 	this.timer = new Timer(90, this);   // contador
 	this.timer.start();
@@ -131,10 +123,10 @@ public class frogger extends JPanel implements ActionListener {
             sequencer.open();
             sequencer.setSequence(intro);
             //sequencer.start();
-        } catch (IOException e) {
-        } catch (MidiUnavailableException e) {
-        } catch (InvalidMidiDataException e) {
-        }
+        } 
+        catch (IOException e) { }        
+        catch (MidiUnavailableException e) { }
+        catch (InvalidMidiDataException e) { }
     }
 
 
@@ -143,18 +135,18 @@ public class frogger extends JPanel implements ActionListener {
 
     /** Realiza la accion de salida del juego */
     private void out() {
-        /* poner aqui la accion de salida */
         if (this.froggy.lives > 0) {
             this.froggy.lives--;
 
             /* punto de reaparicion */
             this.froggy.x = 6 * this.froggy.width;
             this.froggy.y = 12 * this.froggy.height;
-
             this.froggy.alive = true;
         }
-        else 
+        else {
+            /* accion de salida aqui */
             System.exit(1);
+        }
     }
 
     /** Muestra la informacion sobre el juego */
@@ -198,8 +190,7 @@ public class frogger extends JPanel implements ActionListener {
             this.froggy.move();
 
             if (this.froggy.dy == -1)
-                this.froggy.score += 10;            
-
+                this.froggy.score += 10; // puntos por subir
             if (this.froggy.score % 1000 == 0 && this.froggy.score != 0)
                 this.froggy.lives++;
         }
@@ -213,7 +204,6 @@ public class frogger extends JPanel implements ActionListener {
         if (this.timeL == 0) {
             System.out.println("Time is out!!!");
             this.timeL = 600 - speed * 4;
-
             out();
         }
 

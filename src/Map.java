@@ -5,26 +5,20 @@
  *  FECHA: Mon Oct 17 2011
  *  
  *  DESCRIPCION: clase para un tablero.
- *
- *    Map[4][5]  ----------- x       Map[0][1] = a
- *             |  o a o o o          Map[2][2] = c
- *             |  o o o o o
- *             |  o o c o o          Map[y][x]
- *             |  t o o o o
- *             y
  *----------------------------------------------------------------------
  */
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+
 public class Map {
-    public MapElement [][] map;     // tablero.
-    private Actor [][] pLayer;      // capa del jugador
+    public MapElement [][] map;            // tablero.
+    private Actor [][] pLayer;             // capa del jugador
     private ArrayList <Actor> actorList;
-    public int height;              // alto.
-    public int width;               // ancho.
-    public int sectionSide;         // tamaño de la seccion en px.
+    public int height;                     // alto.
+    public int width;                      // ancho.
+    public int sectionSide;                // tamaño de la seccion en px.
 
     
 
@@ -80,12 +74,19 @@ public class Map {
             for (int j = 0; j < this.width; j++)
                 this.map[i][j].draw(g2d);
 
-        for (int i = 0; i < this.actorList.size(); i++)
+        Actor bonus = this.actorList.get(0);
+        for (int i = 0; i < this.actorList.size(); i++) {
+            if (this.actorList.get(i).property.equals("bonus")) {
+                bonus = this.actorList.get(i);
+                continue;
+            }
             this.actorList.get(i).draw(g2d);
+        }
+        bonus.draw(g2d);
 
         for (int i = 0; i < this.height; i++)
             for (int j = 0; j < this.width; j++)
-                this.pLayer[i][j].draw(g2d);                
+                this.pLayer[i][j].draw(g2d); 
                     
     }
 
@@ -125,19 +126,31 @@ public class Map {
         for (int i = 0; i < this.actorList.size(); i++) {
             Actor current = this.actorList.get(i);
 
-            if (player.y == current.y) {
-                if (player.x >= current.x - tolerance && player.x < 
-                    current.x + current.width + tolerance &&
-                    player.y == current.y || 
-                    (player.x + player.width >= current.x + tolerance &&
-                     player.x + player.width < current.x + current.width)) {
+            if (player.y == current.y) { 
+                if (player.x + player.width > current.x + tolerance &&
+                    player.x < current.x + current.width - tolerance) {
 
                     if (current.property.equals("enemy"))
                         return 1;
                     
+                    if (current.property.equals("bonus")) {
+                        player.speed = current.speed * current.direction;
+                        this.actorList.remove(i);
+                        
+                        // ADVERTENCIA: esto es para uso especifico de 
+                        // frogger.java
+                        if (player instanceof Frog) {
+                            Frog n = (Frog) player;
+                            n.score += 100;
+                            //player = n;
+                        }
+
+                        return 2;
+                    }
+
                     if (current.property.equals("dynamic")) {
                         player.speed = current.speed * current.direction;
-
+                        
                         return 2;
                     }
                 }                    
@@ -152,10 +165,17 @@ public class Map {
         for (int i = 0; i < this.actorList.size(); i++) {
             Actor current = this.actorList.get(i);
 
+            /* si el actor actual esta fuera del limite derecho */
             if (current.x > this.width * this.sectionSide && 
-                current.direction == 1)
+                current.direction == 1) {
+                if (current.property.equals("bonus")) {
+                    this.actorList.remove(i);
+                    continue;
+                }                
                 current.x = -current.width;
+            }
 
+            /* si el actor actual esta fuera del limite izquierdo */
             else if (current.x + current.width 
                      < 0 && current.direction == -1)
                 current.x = this.width * this.sectionSide + current.width;
@@ -176,11 +196,10 @@ public class Map {
         int x = actor.x / this.sectionSide;
         Actor N = new NullActor(y, x, this.sectionSide);
         int tolerance = this.sectionSide / 4;
-        int collision;
 
         moveActors();
 
-        /* chequeo de los limites del mapa */
+        /* chequeo de los limites del mapa y colisionadores*/
         if (y + newY == this.height) {
             actor.y -= actor.height;
             newY = 0;
@@ -189,7 +208,6 @@ public class Map {
         else if (x + newX == this.width || x + newX == -1) {
             return false;
         }
-
         if (this.map[y + newY][x].property.equals("collider"))
           return false;
 
@@ -200,11 +218,11 @@ public class Map {
 
 
         /* chequeo de desgracias */
-        y = actor.y / this.sectionSide;
-        x = actor.x / this.sectionSide;
+        y = actor.y / this.sectionSide;  // refresca y
+        x = actor.x / this.sectionSide;  // refresca x
 
         if (actor.property.equals("player")) {
-            collision = checkCollision(actor);
+            int collision = checkCollision(actor);
             if (collision == 0) {
                 if (this.map[y][x].property.equals("killer"))
                     return false;

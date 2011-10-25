@@ -21,6 +21,7 @@ abstract class Actor extends MapElement {
      *  enemy
      *  dynamic
      *  null
+     *  bonus
      */
     
 

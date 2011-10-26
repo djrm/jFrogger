@@ -1,10 +1,10 @@
 /*----------------------------------------------------------------------
- *  NOMBRE: Sidewalk.java 
+ *  NOMBRE: Border.java 
  *  POR: Daniel Ramirez Martinez
  *  EMAIL: danielramirezz123@gmail.com
- *  FECHA: Wed Oct 19 2011
+ *  FECHA: Tue Oct 25 2011
  *  
- *  DESCRIPCION: clase para la banqueta
+ *  DESCRIPCION: bordes superiores
  *----------------------------------------------------------------------
  */
 
@@ -14,21 +14,23 @@ import java.awt.image.ImageObserver;
 import javax.swing.ImageIcon;
 
 
-public class Sidewalk extends Section implements ImageObserver {
+public class Border extends Section implements ImageObserver {
     private static Image img = 
-        new ImageIcon("img/Grass.png").getImage();
+        new ImageIcon("img/Border.png").getImage();
 
-    public Sidewalk(int y, int x, int side) {
+
+    public Border(int y, int x, int side) {
         this.x = x * side;
         this.y = y * side;
         this.side = side;
-        this.property = new String("ghost");
+        this.property = new String("collider");
     }
 
 
 
     /*  --M E T O D O S--  */
+
     public void draw(Graphics2D g2d) {
-        g2d.drawImage(Sidewalk.img, this.x, this.y, this);
+        g2d.drawImage(Border.img, this.x, this.y, this);
     }
 }

@@ -186,12 +186,14 @@ public class Map {
     }
 
 
-    /** Valida el movimiento de un actor. Retornara 1 siempre 
-     *  y cuando no haya ocurrido un siniestro.
+    /** Valida el movimiento de un actor. Retornara:
+     *  0 si sucedio siniestro
+     *  1 si no sucedio siniestro
+     *  2 si llego a una meta
      *  newY y newX son los incrementos a la posicion actual del
      *  actor.
      */
-    public boolean checkMovement(Actor actor, int newY, int newX) {
+    public int checkMovement(Actor actor, int newY, int newX) {
         int y = actor.y / this.sectionSide;
         int x = actor.x / this.sectionSide;
         Actor N = new NullActor(y, x, this.sectionSide);
@@ -199,17 +201,32 @@ public class Map {
 
         moveActors();
 
+        /* calcula la casilla actual del actor CASO para x */
+        if (actor.x + actor.width < x * this.sectionSide + tolerance * 3)
+            newX = -1;
+        else if (actor.x > x * this.sectionSide + tolerance * 3)
+            newX = 1;
+
+
         /* chequeo de los limites del mapa y colisionadores*/
         if (y + newY == this.height) {
             actor.y -= actor.height;
             newY = 0;
-            return true;
+            return 1;
+        }
+        else if (y + newY < 0) {
+            actor.y = 0;
+            newY = 0;
+            return 1;
         }
         else if (x + newX == this.width || x + newX == -1) {
-            return false;
+            return 0;
         }
-        if (this.map[y + newY][x].property.equals("collider"))
-          return false;
+        if (this.map[y + newY][x].property.equals("collider")) {
+            actor.y += actor.height;
+            newY = 0;
+            return 1;
+        }
 
         if (actor.property.equals("player")) {
             this.pLayer[y][x] = N;
@@ -225,19 +242,24 @@ public class Map {
             int collision = checkCollision(actor);
             if (collision == 0) {
                 if (this.map[y][x].property.equals("killer"))
-                    return false;
+                    return 0;
+                else if (this.map[y][x].property.equals("goal")) {
+                    this.map[y][x].property = new String("killer");
+                    return 2;
+                }
+                    
             }
             else if (collision == 1) {
-                return false;
+                return 0;
             }
         }
         /* si un actor mata a un jugador */
         else if (actor.property.equals("killer")) {            
             for (int i = x; i < actor.width; i++)
                 if (this.pLayer[y][i].property.equals("player"))
-                    return false;
+                    return 0;
         }
 
-        return true;
+        return 1;
     }
 }

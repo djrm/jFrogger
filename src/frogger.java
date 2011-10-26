@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 import java.util.Scanner;
 
+import java.awt.Font;
+
 /* sonido */
 import java.io.File;
 import java.io.IOException;
@@ -32,11 +34,15 @@ import javax.sound.midi.MidiUnavailableException;
 
 
 public class frogger extends JPanel implements ActionListener {
-    private Frog froggy;  // jugador.
-    private Map level;    // nivel.
-    private int timeL;    // tiempo de juego.
-    private int speed;    // dificultad del juego.
+    private Frog froggy;    // jugador.
+    private Map level;      // nivel.
+    private int timeL;      // tiempo de juego.
+    private int speed;      // dificultad del juego.
+    private int beatScore;  // puntuacion a lograr para vida extra
+    private int goals;      // metas que ha logrado
+    private Font font;
     private Timer timer;
+    private Graphics2D g2d;
     
     /* sonido */
     private Sequence intro;
@@ -62,6 +68,8 @@ public class frogger extends JPanel implements ActionListener {
         setDoubleBuffered(true);
         setBackground(Color.BLACK);
         this.speed = 1;
+        this.beatScore = 1000;
+        this.font = new Font("Sans",Font.PLAIN, 16);
 
         /* inicializacion del mapa y rana */
         this.level = new Map(13, 700 / 25, 25);
@@ -108,7 +116,20 @@ public class frogger extends JPanel implements ActionListener {
         for (int j = 0; j < this.level.width; j++) {
             this.level.map[6][j] = new Sidewalk(6, j, 25);
             this.level.map[12][j] = new Sidewalk(12, j, 25);
-        }                        
+        }
+        /* metas y borde superior */
+        this.level.map[0][0] = new Border(0, 0, 25);
+        
+        for (int i = 0; i < 25; i += 4) {
+            this.level.map[0][i] = new Border(0, i, 25);
+            this.level.map[0][i + 1] = new Border(0, i + 1, 25);
+        }
+        this.level.map[0][26] = new Border(0, 26, 25);
+        this.level.map[0][27] = new Border(0, 27, 25);
+        for (int i = 2; i < 25; i += 4) {        
+            this.level.map[0][i] = new Goal(0, i, 25);
+            this.level.map[0][i + 1] = this.level.map[0][i];
+        }
 
         this.timeL = 600 - speed * 4;  // timepo de juego.
 
@@ -133,19 +154,60 @@ public class frogger extends JPanel implements ActionListener {
     
     /*  --M E T O D O S-- */    
 
-    /** Realiza la accion de salida del juego */
-    private void out() {
-        if (this.froggy.lives > 0) {
-            this.froggy.lives--;
+    /** Realiza la accion de salida del juego 
+     *  valores de entrada:
+     *  0 perdio por tiempo
+     *  1 perdio por accidente
+     *  2 gano
+     *  3 si llego a una meta
+     */
+    private void out(int outCode) {
+        String msg = new String("");
 
-            /* punto de reaparicion */
+        if (outCode == 2) {
+            msg.concat("croooac, Ganaste!!!\n\n");
+            msg.concat("Tu puntuacion: " + froggy.score);
+
+            //System.out.println("croooac, Ganaste!!!");
+            //System.out.println("your Score: " + froggy.score);
+            //System.exit(1);
+        }
+        else if (outCode == 3) {
+            this.froggy.score += 200; 
             this.froggy.x = 6 * this.froggy.width;
             this.froggy.y = 12 * this.froggy.height;
-            this.froggy.alive = true;
+            this.goals++;
+            msg.concat("frooog job!!!\n\n");
+            //System.out.println("frooog job!!!");
         }
+        /* muerto */
         else {
-            /* accion de salida aqui */
-            System.exit(1);
+            if (outCode == 1) {
+                msg.concat("Wooops, has muerto!!!");
+                //System.out.println("Wooops, has muerto!!!");
+            }
+            if (outCode == 0) {
+                System.out.println("birik, se acabo el tiempo!!!");
+                this.timeL = 600 - speed * 4;
+            }
+            if (this.froggy.lives > 0) {
+                this.froggy.lives--;
+                
+                /* punto de reaparicion */
+                this.froggy.x = 6 * this.froggy.width;
+                this.froggy.y = 12 * this.froggy.height;
+                this.froggy.alive = true;
+            }
+            else {
+                /* accion de salida aqui */
+                System.exit(1);
+            } 
+            /*
+            g2d.setColor(Color.BLACK);
+            g2d.fillRect(305, 30, 100, 100);
+            g2d.drawString(msg, 290, 50);
+            this.repaint();
+            */
         }
     }
 
@@ -174,8 +236,10 @@ public class frogger extends JPanel implements ActionListener {
 
 
     public void paint(Graphics g) {
-	Graphics2D g2d = (Graphics2D) g;
+	g2d = (Graphics2D) g;
 	super.paint(g);
+
+        g2d.setFont(font);
 
         this.level.draw(g2d);   // dibuja todos los elementos de mapa
         infoScreen(g2d);
@@ -183,28 +247,36 @@ public class frogger extends JPanel implements ActionListener {
     }
     
     public void actionPerformed(ActionEvent e) {
-        this.froggy.alive = 
+        int state = 
             this.level.checkMovement(froggy, froggy.dy, froggy.dx);
 
-        if (this.froggy.alive) {
+        if (state == 1) {
             this.froggy.move();
 
             if (this.froggy.dy == -1)
                 this.froggy.score += 10; // puntos por subir
-            if (this.froggy.score % 1000 == 0 && this.froggy.score != 0)
-                this.froggy.lives++;
         }
-        else {
-            System.out.println("oh no, you're dead!!!");
-            out();
+        else if (state == 2) {
+            this.froggy.move(); 
+            out(3);   // llego a la meta
+        }
+        else if (state == 0){
+            out(1); // murio
         }  
+        
+        /* vidas extras por puntuacion */
+        if (this.froggy.score >= this.beatScore) {
+            this.froggy.lives++;
+            this.beatScore += 1000;
+            this.timeL += 100;
+        }
+
+        if (goals == 6)
+            out(2);  // termino el juego
 
         this.timeL--;
-        /* se acabo el timepo? */
         if (this.timeL == 0) {
-            System.out.println("Time is out!!!");
-            this.timeL = 600 - speed * 4;
-            out();
+            out(0);  // se acabo el tiempo
         }
 
         this.repaint(); 

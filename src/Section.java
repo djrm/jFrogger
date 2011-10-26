@@ -19,6 +19,7 @@ abstract class Section extends MapElement {
      *  ghost
      *  killer
      *  null
+     *  goal
      */
 
 }

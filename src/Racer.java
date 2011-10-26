@@ -50,16 +50,4 @@ public class Racer extends Actor implements ImageObserver {
     public void draw(Graphics2D g2d) {
         g2d.drawImage(this.img, this.x, this.y, this);
     }
-
-    public void move() {
-        if (this.direction == -1)
-            this.x -= speed;
-        else
-            this.x += speed;
-    }
-
-    public boolean imageUpdate(Image img, int infoFlags, int x, int y,
-                               int width, int height) {
-        return true;
-    }
 }

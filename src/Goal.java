@@ -1,12 +1,13 @@
 /*----------------------------------------------------------------------
- *  NOMBRE: Truck.java 
+ *  NOMBRE: Goal.java 
  *  POR: Daniel Ramirez Martinez
  *  EMAIL: danielramirezz123@gmail.com
- *  FECHA: Fri Oct 21 2011
+ *  FECHA: Sat Oct 22 2011
  *  
- *  DESCRIPCION: camion
+ *  DESCRIPCION: Meta.
  *----------------------------------------------------------------------
  */
+
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -14,28 +15,34 @@ import java.awt.image.ImageObserver;
 import javax.swing.ImageIcon;
 
 
-public class Truck extends Actor implements ImageObserver {
+public class Goal extends Section implements ImageObserver {
     private Image img;
 
-    private static Image truck1 = 
-        new ImageIcon("img/Truck1.png").getImage();
+    private static Image goal = 
+        new ImageIcon("img/Goal.png").getImage();
+    private static Image taken = 
+        new ImageIcon("img/Goal-taken.png").getImage();
 
 
-    public Truck(int y, int x, int side, int direction, int speed) {
+    public Goal(int y, int x, int side) {
         this.x = x * side;
         this.y = y * side;
-        this.width = side * 2;
-        this.height = side;
-        this.direction = direction;
-        this.speed = speed;
-        this.property = new String("enemy");
-        this.img = Truck.truck1;
+        this.side = side;
+        this.property = new String("goal");
     }
+
 
 
     /*  --M E T O D O S--  */
 
     public void draw(Graphics2D g2d) {
+        if (this.property.equals("goal")) {
+            this.img = goal;
+        }
+        else {
+            this.img = taken;
+        }
+
         g2d.drawImage(this.img, this.x, this.y, this);
     }
 }

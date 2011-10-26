@@ -17,8 +17,8 @@ import javax.swing.ImageIcon;
 public class Turtles extends Actor implements ImageObserver {
     private Image img;
     private int cycle;
-    private boolean tramp;
-    public boolean available;
+    private boolean tramp;      // 'true' si se oculta
+    public boolean available;   // 'true' si esta disponible
 
     private static Image up = 
         new ImageIcon("img/TurtleUp.png").getImage();
@@ -47,13 +47,13 @@ public class Turtles extends Actor implements ImageObserver {
     /*  --M E T O D O S--  */
 
     public void draw(Graphics2D g2d) {
-        if (!tramp) {
+        if (this.tramp) {
             if (this.available) {
-                img = up;
+                this.img = up;
                 this.property = new String("dynamic");
             }
             else {
-                img = mid;
+                this.img = mid;
                 this.property = new String("enemy");
             }
 
@@ -62,23 +62,8 @@ public class Turtles extends Actor implements ImageObserver {
                 this.available = !this.available;
                 this.cycle = 0;
             }
-        }        
-        
+        }                
         for (int i = this.x; i < this.x + this.width; i += this.height)
             g2d.drawImage(this.img, i, this.y, this);
-    }
-
-    public void move() {
-        if (this.direction == -1) {
-            this.x -= speed;
-        }
-        else {
-            this.x += speed;
-        }
-    }
-
-    public boolean imageUpdate(Image img, int infoFlags, int x, int y,
-                               int width, int height) {
-        return true;
     }
 }

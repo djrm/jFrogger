@@ -29,7 +29,6 @@ public class Water extends Section implements ImageObserver {
         this.x = x * side;
         this.y = y * side;
         this.side = side;
-
         this.property = new String("killer");
         this.moving = false;
         this.cycle = 0;
@@ -49,12 +48,5 @@ public class Water extends Section implements ImageObserver {
             this.moving = !this.moving;
             this.cycle = 0;
         }
-
     }
-
-    public boolean imageUpdate(Image img, int infoFlags, int x, int y,
-                               int width, int height) {
-        return true;
-    }
-
 }

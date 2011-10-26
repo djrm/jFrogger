@@ -21,7 +21,6 @@ public class Frog extends Actor implements ImageObserver {
     public int score;              // puntuacion de la rana
     public boolean alive;          // true si esta vivo
     public byte lives;             // las vidas de la rana
-    private boolean walking;       // false si esta estatico 
     private Image img;             // imagen para la rana
 
     private static Image frogStatic =
@@ -41,7 +40,6 @@ public class Frog extends Actor implements ImageObserver {
         this.dy = 0;
         this.width = Math.abs(side);
         this.height = Math.abs(side);
-        this.walking = false;
         this.alive = true;
         this.score = 0;
         this.lives = 3;
@@ -127,10 +125,5 @@ public class Frog extends Actor implements ImageObserver {
             dy = 0;
 
         this.img = frogStatic;
-    }
-
-    public boolean imageUpdate(Image img, int infoFlags, int x, int y,
-                               int width, int height) {
-        return true;
     }
 }

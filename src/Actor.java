@@ -28,5 +28,13 @@ abstract class Actor extends MapElement {
     /*  --M E T O D O S--  */
 
     /** Realiza el movimiento del actor */
-    public abstract void move();
+    /* para frogger, donde el movimiento esta basado en x */
+    public void move() {
+        if (this.direction == -1) {
+            this.x -= speed;
+        }
+        else {
+            this.x += speed;
+        }
+    }
 }

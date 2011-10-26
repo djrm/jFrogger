@@ -42,7 +42,7 @@ public class frogger extends JPanel implements ActionListener {
     private int goals;      // metas que ha logrado
     private Font font;
     private Timer timer;
-    private Graphics2D g2d;
+
     
     /* sonido */
     private Sequence intro;
@@ -162,37 +162,31 @@ public class frogger extends JPanel implements ActionListener {
      *  3 si llego a una meta
      */
     private void out(int outCode) {
-        String msg = new String("");
-
         if (outCode == 2) {
-            msg.concat("croooac, Ganaste!!!\n\n");
-            msg.concat("Tu puntuacion: " + froggy.score);
-
-            //System.out.println("croooac, Ganaste!!!");
-            //System.out.println("your Score: " + froggy.score);
-            //System.exit(1);
+            System.out.println("croooac, Ganaste!!!");
+            System.out.println("Tu puntuacion: " + froggy.score);
+            System.exit(1);
         }
         else if (outCode == 3) {
             this.froggy.score += 200; 
-            this.froggy.x = 6 * this.froggy.width;
+            this.goals++;            
+            this.timeL += 100;
+            /* punto de reaparicion */
+            this.froggy.x = 6 * this.froggy.width; 
             this.froggy.y = 12 * this.froggy.height;
-            this.goals++;
-            msg.concat("frooog job!!!\n\n");
-            //System.out.println("frooog job!!!");
+            System.out.println("frooog job!!!");
         }
         /* muerto */
         else {
             if (outCode == 1) {
-                msg.concat("Wooops, has muerto!!!");
-                //System.out.println("Wooops, has muerto!!!");
+                System.out.println("Wooops, has muerto!!!");
             }
             if (outCode == 0) {
                 System.out.println("birik, se acabo el tiempo!!!");
                 this.timeL = 600 - speed * 4;
             }
             if (this.froggy.lives > 0) {
-                this.froggy.lives--;
-                
+                this.froggy.lives--;               
                 /* punto de reaparicion */
                 this.froggy.x = 6 * this.froggy.width;
                 this.froggy.y = 12 * this.froggy.height;
@@ -201,13 +195,7 @@ public class frogger extends JPanel implements ActionListener {
             else {
                 /* accion de salida aqui */
                 System.exit(1);
-            } 
-            /*
-            g2d.setColor(Color.BLACK);
-            g2d.fillRect(305, 30, 100, 100);
-            g2d.drawString(msg, 290, 50);
-            this.repaint();
-            */
+            }            
         }
     }
 
@@ -236,13 +224,14 @@ public class frogger extends JPanel implements ActionListener {
 
 
     public void paint(Graphics g) {
-	g2d = (Graphics2D) g;
+	Graphics2D g2d = (Graphics2D) g;
 	super.paint(g);
 
         g2d.setFont(font);
 
         this.level.draw(g2d);   // dibuja todos los elementos de mapa
         infoScreen(g2d);
+        
 
     }
     

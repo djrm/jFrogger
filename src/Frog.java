@@ -89,12 +89,12 @@ public class Frog extends Actor implements ImageObserver {
         if (key == KeyEvent.VK_LEFT) {
             this.dx = -1;
             this.dy = 0;
-            this.direction = 0; // por que asi sirve
+            this.direction = 0;
         }
         else if (key == KeyEvent.VK_RIGHT) {
             this.dx = 1;
             this.dy = 0;
-            this.direction = 180; // por que asi sirve
+            this.direction = 180;
         }
         else if (key == KeyEvent.VK_DOWN) {
             this.dy = 1;

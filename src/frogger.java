@@ -11,15 +11,14 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Random;
 import javax.swing.Timer;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
-import java.util.Scanner;
 
 import java.awt.Font;
 
@@ -40,9 +39,10 @@ public class frogger extends JPanel implements ActionListener {
     private int speed;      // dificultad del juego.
     private int beatScore;  // puntuacion a lograr para vida extra
     private int goals;      // metas que ha logrado
+    private int bonusTime;  // timepo de reaparicion del bonus
+    private int deathTime;  // tiempo que aparece la imagen de muerte
     private Font font;
     private Timer timer;
-
     
     /* sonido */
     private Sequence intro;
@@ -61,23 +61,26 @@ public class frogger extends JPanel implements ActionListener {
     }
 
 
-
     public frogger() {
+        // propiedades de la ventana
         addKeyListener(new TAdapter());
         setFocusable(true);
         setDoubleBuffered(true);
         setBackground(Color.BLACK);
+
+        // propiedades del juego
         this.speed = 1;
         this.beatScore = 1000;
-        this.font = new Font("Sans",Font.PLAIN, 16);
+        //this.font = new Font("Sans", Font.PLAIN, 16);
+        this.bonusTime = 1;
+        this.deathTime = 3;
 
-        /* inicializacion del mapa y rana */
+        // inicializacion del mapa y rana
         this.level = new Map(13, 700 / 25, 25);
         this.froggy = new Frog(12, 9, 25);
 
-        /* agrega a el jugador y actores al tablero */
+        // agrega a el jugador y actores al tablero
         this.level.addPlayer(this.froggy);
-        this.level.addActor(new SheFrog(3, 0, 25, 1, 1 + speed));
         for (int i = 0; i < 25; i += 6) {
             level.addActor(new Racer(7, i, 25, 1, 3 + speed, "red"));
             level.addActor(new Racer(11, i + 3, 25, 1, 1 + speed, "red"));
@@ -101,25 +104,25 @@ public class frogger extends JPanel implements ActionListener {
             t = !t;
         }
         for (int i = 0; i < 29; i += 4) {
-            level.addActor(new Turtles(2, i, 25, 2, -1, 1 + speed, t));
+            level.addActor(new Turtles(2, i, 25, 2, -1, 2 + speed, t));
             t = !t;
         }
 
+
         /* construccion del mapa */
-        /* rio y carretera */
+        // rio y carretera
         for (int i = 1; i < 6; i++)
             for (int j = 0; j < this.level.width; j++) {
                 this.level.map[i][j] = new Water(i, j, 25);
                 this.level.map[i + 6][j] = new Road(i + 6, j, 25);
             }        
-        /* banquetas */
+        // banquetas
         for (int j = 0; j < this.level.width; j++) {
             this.level.map[6][j] = new Sidewalk(6, j, 25);
             this.level.map[12][j] = new Sidewalk(12, j, 25);
         }
-        /* metas y borde superior */
-        this.level.map[0][0] = new Border(0, 0, 25);
-        
+        // metas y borde superior
+        this.level.map[0][0] = new Border(0, 0, 25);        
         for (int i = 0; i < 25; i += 4) {
             this.level.map[0][i] = new Border(0, i, 25);
             this.level.map[0][i + 1] = new Border(0, i + 1, 25);
@@ -154,6 +157,19 @@ public class frogger extends JPanel implements ActionListener {
     
     /*  --M E T O D O S-- */    
 
+    /** Agrega una rana de bonus al juego */
+    private void addBonus() {
+        Random r = new Random();
+        int pos = Math.abs(r.nextInt()) % 4;
+        if (pos == 0) pos = 1;
+        if (pos == 2) pos = 3;
+        if (pos == 3) pos = 4;
+        
+        // la colocamos aqui y esperamos a que un dinamico se la
+        // lleve
+        this.level.addActor(new SheFrog(pos, -2, 25, 0, 0));
+    }
+
     /** Realiza la accion de salida del juego 
      *  valores de entrada:
      *  0 perdio por tiempo
@@ -171,10 +187,10 @@ public class frogger extends JPanel implements ActionListener {
             this.froggy.score += 200; 
             this.goals++;            
             this.timeL += 100;
-            /* punto de reaparicion */
+            // punto de reaparicion
             this.froggy.x = 6 * this.froggy.width; 
             this.froggy.y = 12 * this.froggy.height;
-            System.out.println("frooog job!!!");
+            System.out.println("Binevenido a casa!!!");
         }
         /* muerto */
         else {
@@ -187,7 +203,7 @@ public class frogger extends JPanel implements ActionListener {
             }
             if (this.froggy.lives > 0) {
                 this.froggy.lives--;               
-                /* punto de reaparicion */
+                // punto de reaparicion
                 this.froggy.x = 6 * this.froggy.width;
                 this.froggy.y = 12 * this.froggy.height;
                 this.froggy.alive = true;
@@ -203,17 +219,17 @@ public class frogger extends JPanel implements ActionListener {
     public void infoScreen(Graphics2D g2d) {
         g2d.setColor(Color.WHITE);        
 
-        /* puntos del jugador */
+        // puntos del jugador
         g2d.drawString("SCORE: " + this.froggy.score, 20, 370);
 
-        /* vidas */
+        // vidas
         int k = 15;
         for (int i = 0; i < this.froggy.lives; i++) {
             g2d.fillRect(680 - k, 340, 10, 10);
             k += 15;
         }
 
-        /* temporizador */
+        // temporizador
         g2d.drawString("TIME: ", 20, 400);
         if (this.timeL < 60) 
             g2d.setColor(Color.RED);
@@ -226,13 +242,9 @@ public class frogger extends JPanel implements ActionListener {
     public void paint(Graphics g) {
 	Graphics2D g2d = (Graphics2D) g;
 	super.paint(g);
-
-        g2d.setFont(font);
-
+        //g2d.setFont(font);
         this.level.draw(g2d);   // dibuja todos los elementos de mapa
-        infoScreen(g2d);
-        
-
+        this.infoScreen(g2d);
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -247,11 +259,15 @@ public class frogger extends JPanel implements ActionListener {
         }
         else if (state == 2) {
             this.froggy.move(); 
-            out(3);   // llego a la meta
+            this.out(3);   // llego a la meta
         }
         else if (state == 0){
-            out(1); // murio
+            this.out(1); // murio
         }  
+        else if (state == 3) {
+            // tomo un bonus
+            this.froggy.score += 100;
+        }
         
         /* vidas extras por puntuacion */
         if (this.froggy.score >= this.beatScore) {
@@ -259,14 +275,21 @@ public class frogger extends JPanel implements ActionListener {
             this.beatScore += 1000;
             this.timeL += 100;
         }
+        // metas del juego
+        if (this.goals == 6)
+            this.out(2);  // termino el juego
 
-        if (goals == 6)
-            out(2);  // termino el juego
-
+        // tiempo de juego
         this.timeL--;
         if (this.timeL == 0) {
-            out(0);  // se acabo el tiempo
+            this.out(0);  // se acabo el tiempo
         }
+
+        // bonus
+        if (this.bonusTime % 700 == 0)
+            this.addBonus();
+        this.bonusTime++;
+            
 
         this.repaint(); 
     }

@@ -22,8 +22,8 @@ public class SheFrog extends Actor implements ImageObserver {
 
 
     public SheFrog(int y, int x, int side, int direction, int speed) {
-        this.x = Math.abs(x * side);
-        this.y = Math.abs(y * side);
+        this.x = x * side;
+        this.y = y * side;
         this.width = side;
         this.height = side;
         this.property = new String("bonus");

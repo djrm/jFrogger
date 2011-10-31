@@ -33,8 +33,11 @@ public class Goal extends Section implements ImageObserver {
 
 
 
-    /*  --M E T O D O S--  */
+/*=========================  M E T O D O S  =========================*/
 
+    /** Dibuja la meta con la imagen vacia u ocupada segun su 
+     *  propiedad.
+     */
     public void draw(Graphics2D g2d) {
         if (this.property.equals("goal")) {
             this.img = goal;

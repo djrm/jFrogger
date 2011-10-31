@@ -25,7 +25,7 @@ abstract class MapElement {
     
 
 
-    /*  --M E T O D O S--  */
+/*=========================  M E T O D O S  =========================*/
 
     /** Dibuja el elemento de el mapa */
     public abstract void draw(Graphics2D g2d);

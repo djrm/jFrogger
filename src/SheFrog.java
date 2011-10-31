@@ -32,10 +32,9 @@ public class SheFrog extends Actor implements ImageObserver {
     }
 
 
-    
-    /*  --M E T O D O S--  */
+/*=========================  M E T O D O S  =========================*/    
 
-    /** Dibuja a la rana */
+    /** Dibuja a la rana bonus */
     public void draw(Graphics2D g2d) {
         g2d.drawImage(SheFrog.img, this.x, this.y, this);
     }

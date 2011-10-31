@@ -15,8 +15,7 @@ import javax.swing.ImageIcon;
 
 
 public class Border extends Section implements ImageObserver {
-    private static Image img = 
-        new ImageIcon("img/Border.png").getImage();
+    private static Image img = new ImageIcon("img/Border.png").getImage();
 
 
     public Border(int y, int x, int side) {
@@ -28,7 +27,7 @@ public class Border extends Section implements ImageObserver {
 
 
 
-    /*  --M E T O D O S--  */
+/*=========================  M E T O D O S  =========================*/
 
     public void draw(Graphics2D g2d) {
         g2d.drawImage(Border.img, this.x, this.y, this);

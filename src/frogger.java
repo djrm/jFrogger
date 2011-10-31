@@ -8,6 +8,7 @@
  *----------------------------------------------------------------------
  */
 
+import java.util.Random;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -15,42 +16,32 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Random;
+import java.awt.image.ImageObserver;
 import javax.swing.Timer;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
-
+import javax.swing.ImageIcon;
+import java.awt.Image;
 import java.awt.Font;
 
-/* sonido */
-import java.io.File;
-import java.io.IOException;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiUnavailableException;
 
-
-public class frogger extends JPanel implements ActionListener {
+public class frogger extends JPanel 
+    implements ActionListener, ImageObserver {
     private Frog froggy;    // jugador.
     private Map level;      // nivel.
     private int timeL;      // tiempo de juego.
     private int speed;      // dificultad del juego.
     private int beatScore;  // puntuacion a lograr para vida extra
     private int goals;      // metas que ha logrado
-    private int bonusTime;  // timepo de reaparicion del bonus
-    private int deathTime;  // tiempo que aparece la imagen de muerte
+    private int bonusTime;  // timepo de reaparicion del bonus    
+    private Death d;
     private Font font;
     private Timer timer;
-    
-    /* sonido */
-    private Sequence intro;
-    private Sequencer sequencer;
+    private Image img = new ImageIcon("img/Cover.png").getImage();
 
 
     public static void main(String args[]) {
-	JFrame frame = new JFrame("Frogger");
+	JFrame frame = new JFrame("JFrogger");
 
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	frame.add(new frogger());
@@ -58,10 +49,13 @@ public class frogger extends JPanel implements ActionListener {
 	frame.setLocationRelativeTo(null);
         frame.setResizable(false);
 	frame.setVisible(true);
+        frame.setIconImage(new ImageIcon("img/Icon.png").getImage());
     }
 
 
     public frogger() {
+        boolean t = true;
+
         // propiedades de la ventana
         addKeyListener(new TAdapter());
         setFocusable(true);
@@ -71,9 +65,9 @@ public class frogger extends JPanel implements ActionListener {
         // propiedades del juego
         this.speed = 1;
         this.beatScore = 1000;
-        //this.font = new Font("Sans", Font.PLAIN, 16);
         this.bonusTime = 1;
-        this.deathTime = 3;
+        this.d = new Death(3);
+        //this.font = new Font("Sans", Font.PLAIN, 16);
 
         // inicializacion del mapa y rana
         this.level = new Map(13, 700 / 25, 25);
@@ -81,6 +75,7 @@ public class frogger extends JPanel implements ActionListener {
 
         // agrega a el jugador y actores al tablero
         this.level.addPlayer(this.froggy);
+
         for (int i = 0; i < 25; i += 6) {
             level.addActor(new Racer(7, i, 25, 1, 3 + speed, "red"));
             level.addActor(new Racer(11, i + 3, 25, 1, 1 + speed, "red"));
@@ -98,7 +93,6 @@ public class frogger extends JPanel implements ActionListener {
         level.addActor(new Tree(3, 0, 25, "big", 1, 1 + speed));
         level.addActor(new Tree(3, 12, 25, "big", 1, 1 + speed));
         level.addActor(new Tree(3, 24, 25, "big", 1, 1 + speed));        
-        boolean t = true;
         for (int i = 0; i < 31; i += 6) {
             level.addActor(new Turtles(5, i, 25, 3, -1, 1 + speed, t));
             t = !t;
@@ -137,30 +131,18 @@ public class frogger extends JPanel implements ActionListener {
         this.timeL = 600 - speed * 4;  // timepo de juego.
 
 	this.timer = new Timer(90, this);   // contador
-	this.timer.start();
-
-        
-        /* sonido midi */
-        try {
-            intro = MidiSystem.getSequence(new File("audio/intro.mid"));
-            sequencer = MidiSystem.getSequencer();
-            sequencer.open();
-            sequencer.setSequence(intro);
-            //sequencer.start();
-        } 
-        catch (IOException e) { }        
-        catch (MidiUnavailableException e) { }
-        catch (InvalidMidiDataException e) { }
+	//this.timer.start();
     }
 
 
-    
-    /*  --M E T O D O S-- */    
+
+/*=========================  M E T O D O S  =========================*/
 
     /** Agrega una rana de bonus al juego */
     private void addBonus() {
         Random r = new Random();
-        int pos = Math.abs(r.nextInt()) % 4;
+        int pos = Math.abs(r.nextInt()) % 5;
+
         if (pos == 0) pos = 1;
         if (pos == 2) pos = 3;
         if (pos == 3) pos = 4;
@@ -206,24 +188,28 @@ public class frogger extends JPanel implements ActionListener {
                 // punto de reaparicion
                 this.froggy.x = 6 * this.froggy.width;
                 this.froggy.y = 12 * this.froggy.height;
-                this.froggy.alive = true;
             }
             else {
                 /* accion de salida aqui */
+                System.out.println("croooac, perdiste!!!");
+                System.out.println("Tu puntuacion: " + froggy.score);
                 System.exit(1);
             }            
         }
     }
 
-    /** Muestra la informacion sobre el juego */
+    /** Muestra la informacion sobre el juego (barra de tiempo,
+     *  vidas y puntuacion).
+     */
     public void infoScreen(Graphics2D g2d) {
+        int k = 15;
+
         g2d.setColor(Color.WHITE);        
 
         // puntos del jugador
         g2d.drawString("SCORE: " + this.froggy.score, 20, 370);
 
         // vidas
-        int k = 15;
         for (int i = 0; i < this.froggy.lives; i++) {
             g2d.fillRect(680 - k, 340, 10, 10);
             k += 15;
@@ -237,19 +223,22 @@ public class frogger extends JPanel implements ActionListener {
         g2d.setColor(Color.WHITE);
     }        
 
-
-
     public void paint(Graphics g) {
 	Graphics2D g2d = (Graphics2D) g;
+
 	super.paint(g);
-        //g2d.setFont(font);
         this.level.draw(g2d);   // dibuja todos los elementos de mapa
         this.infoScreen(g2d);
+        this.d.draw(g2d);       // dibuja la imagen de muerte
+
+        if (!this.timer.isRunning()) {
+            // dibuja la pantalla de presentacion
+            g2d.drawImage(this.img, 0, 0, this);
+        }
     }
     
     public void actionPerformed(ActionEvent e) {
-        int state = 
-            this.level.checkMovement(froggy, froggy.dy, froggy.dx);
+        int state = this.level.checkMovement(froggy, froggy.dy, froggy.dx);
 
         if (state == 1) {
             this.froggy.move();
@@ -259,17 +248,19 @@ public class frogger extends JPanel implements ActionListener {
         }
         else if (state == 2) {
             this.froggy.move(); 
-            this.out(3);   // llego a la meta
+            this.out(3);                 // llego a la meta
         }
         else if (state == 0){
-            this.out(1); // murio
+            this.d.active = true;        // activa la imagen de muerte
+            this.d.x = this.froggy.x;    // copia la posicion de la rana
+            this.d.y = this.froggy.y;    // antes de la reaparicion.
+            this.out(1);                 // murio
         }  
         else if (state == 3) {
-            // tomo un bonus
-            this.froggy.score += 100;
+            this.froggy.score += 100;    // tomo un bonus
         }
         
-        /* vidas extras por puntuacion */
+        // vidas extras por puntuacion
         if (this.froggy.score >= this.beatScore) {
             this.froggy.lives++;
             this.beatScore += 1000;
@@ -277,29 +268,39 @@ public class frogger extends JPanel implements ActionListener {
         }
         // metas del juego
         if (this.goals == 6)
-            this.out(2);  // termino el juego
+            this.out(2);                 // termino el juego
 
         // tiempo de juego
         this.timeL--;
         if (this.timeL == 0) {
-            this.out(0);  // se acabo el tiempo
+            this.d.active = true;
+            this.d.x = this.froggy.x;
+            this.d.y = this.froggy.y;
+            this.out(0);                 // se acabo el tiempo
         }
 
         // bonus
         if (this.bonusTime % 700 == 0)
             this.addBonus();
         this.bonusTime++;
-            
-
+           
         this.repaint(); 
     }
 
+    public boolean imageUpdate(Image img, int infoFlags, int x, int y,
+                               int width, int height) {
+        return true;
+    }
 
 
-    /*  --C L A S E S--  */
+/*=========================  C L A S E S  =========================*/
+
     /* Clase privada TAdapter */
     private class TAdapter extends KeyAdapter {
 	public void keyPressed(KeyEvent e) {
+            if (!timer.isRunning())
+                timer.start();
+
             froggy.keyPressed(e);
         }
 
@@ -307,6 +308,42 @@ public class frogger extends JPanel implements ActionListener {
             froggy.keyReleased(e);
 	}
     }              
+
+    /** clase privada para el icono de muerte */
+    private class Death implements ImageObserver {
+        private int time;
+        private int cTime;
+        public int x;
+        public int y;
+        public boolean active;
+        private Image img = new ImageIcon("img/Frog-dead.png").getImage();
+        
+        public Death(int time) {
+            this.time = time;
+            this.cTime = time;
+            this.active = false;
+        }
+        
+        public void draw(Graphics2D g2d) {
+            if (this.active) {
+                if (this.cTime != 0) {
+                    this.cTime--;
+                }
+                else {
+                    cTime = time;
+                    this.active = false;
+                }
+
+                g2d.drawImage(this.img, this.x, this.y, this);
+            }
+        }
+
+        public boolean imageUpdate(Image img, int infoFlags, 
+                                   int x, int y,
+                                   int width, int height) {
+            return true;
+        }
+    }
 }
 
 

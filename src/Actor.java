@@ -25,7 +25,7 @@ abstract class Actor extends MapElement {
      */
     
 
-    /*  --M E T O D O S--  */
+/*=========================  M E T O D O S  =========================*/
 
     /** Realiza el movimiento del actor */
     /* para frogger, donde el movimiento esta basado en x */

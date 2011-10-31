@@ -4,7 +4,7 @@
  *  EMAIL: danielramirezz123@gmail.com
  *  FECHA: Tue Oct 11 2011
  *  
- *  DESCRIPCION: clase para la rana
+ *  DESCRIPCION: clase para la rana (Jugador).
  *----------------------------------------------------------------------
  */
 
@@ -19,7 +19,6 @@ import java.awt.geom.AffineTransform;
 public class Frog extends Actor implements ImageObserver {
     public int dx, dy;             // distancia al origen
     public int score;              // puntuacion de la rana
-    public boolean alive;          // true si esta vivo
     public byte lives;             // las vidas de la rana
     private Image img;             // imagen para la rana
 
@@ -27,8 +26,6 @@ public class Frog extends Actor implements ImageObserver {
         new ImageIcon("img/Frog-static.png").getImage();
     private static Image frogJumping =
         new ImageIcon("img/Frog-jumping.png").getImage();
-    private static Image frogDead =
-        new ImageIcon("img/Frog-dead.png").getImage();
     
 
     /** Constructor con tamaño.  (y, x)  son las coordenadas 
@@ -40,7 +37,6 @@ public class Frog extends Actor implements ImageObserver {
         this.dy = 0;
         this.width = Math.abs(side);
         this.height = Math.abs(side);
-        this.alive = true;
         this.score = 0;
         this.lives = 3;
         this.property = new String("player");
@@ -51,31 +47,31 @@ public class Frog extends Actor implements ImageObserver {
    
 
 
-    /*  --M E T O D O S--  */
+/*=========================  M E T O D O S  =========================*/
 
-    /** Dibuja a la rana */
+    /** Dibuja a la rana deacuerdo a la direccion especificada por
+     *  'this.direction'.
+     */
     public void draw(Graphics2D g2d) {
         AffineTransform backup = g2d.getTransform(); // respaldo
         AffineTransform at = g2d.getTransform(); // temporal
 
-        if (!this.alive) {
-            img = frogDead;
-        }        
-        else {
-            /* mueve los puntos de la transformacion a (x , y)
-             * de la rana, y gira la direccion sobre el punto central.
-             */
-            at.translate(this.x, this.y);
-            at.rotate(Math.toRadians(this.direction - 90),
-                      (this.width / 2), 
-                      (this.height / 2));
-        }
+        /* mueve los puntos de la transformacion a (x , y)
+         * de la rana, y gira la direccion sobre el punto central.
+         */
+        at.translate(this.x, this.y);
+        at.rotate(Math.toRadians(this.direction - 90),
+                  (this.width / 2), 
+                  (this.height / 2));
 
         g2d.drawImage(this.img, at, this);
         g2d.setTransform(backup);
     }
 
-    /** Accion para el movimiento de la rana */
+    /** Accion para el movimiento de la rana. Incrementa los 
+     *  valores del movimiento en 'x' y 'y' y en caso de que 
+     *  posea velocidad se incrementara 'this.speed'.
+     */
     public void move() {
         this.x += this.dx * this.width;
         this.y += this.dy * this.height;

@@ -22,7 +22,6 @@ public class Map {
     private ArrayList <Actor> [] actorMap;
 
     
-
     /** Construye un tablero rectangular */
     public Map(int height, int width, int sectionSide) {
         this.height = height;
@@ -59,7 +58,7 @@ public class Map {
        
     
 
-    /*  --M E T O D O S--  */
+/*=========================  M E T O D O S  =========================*/
 
     /** Dibuja todas las secciones del mapa */
     public void draw(Graphics2D g2d) {
@@ -93,7 +92,12 @@ public class Map {
             this.player.draw(g2d);
     }
 
-    /** Agrega un actor en la casilla (y , x) del tablero */
+    /** Agrega un actor en el mapa de actores, si el mapa
+     *  de actores ya posee un elemento en la posicion 'actor.y'
+     *  entonces lo agregara a la lista de dicha posiscion 'y'
+     *  en otro caso creara una nueva lista para para alojar el
+     *  el actor insertado.
+     */
     public void addActor(Actor actor) {
         int y = actor.y / this.sectionSide;
         
@@ -113,17 +117,6 @@ public class Map {
         this.player = player;
     }
     
-    /** Devuelve la posicion en x de una casilla segura */
-    public Actor getSafePosition(int y) {
-        ArrayList <Actor> actorList = this.actorMap[y];
-        for (int j = 0; j < actorList.size(); j++) {
-            //if (actorList.get(j).x + this.sectionSide < 0)
-                return (actorList.get(j));
-        }
-        
-        return null;
-    }
-
     /** Verifica si el actor tiene una collision con otro actor.
      *  Retornara 
      *  0 si no la tuvo.
@@ -251,8 +244,7 @@ public class Map {
             return 1;
         }
         // muere si sale de los limites laterales
-        else if (actor.x >= this.width * this.sectionSide || 
-                 actor.x + (newX * actor.width) <= 0) {
+        else if (x + newX >= this.width || x + newX < 0) {
             return 0;
         }
         // collision en y

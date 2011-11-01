@@ -17,13 +17,15 @@ import javax.swing.ImageIcon;
 public class Turtles extends Actor implements ImageObserver {
     private Image img;
     private int cycle;
+    private boolean decreassing;
     private boolean tramp;      // 'true' si se oculta
-    public boolean available;   // 'true' si esta disponible
 
     private static Image up = 
         new ImageIcon("img/TurtleUp.png").getImage();
     private static Image mid = 
         new ImageIcon("img/TurtleMid.png").getImage();
+    private static Image down = 
+        new ImageIcon("img/water.png").getImage();
 
 
     public Turtles(int y, int x, int side, int turtles, int direction,
@@ -37,7 +39,7 @@ public class Turtles extends Actor implements ImageObserver {
         this.speed = speed;
         this.property = new String("dynamic");
         this.tramp = tramp;
-        this.available = true;
+        this.decreassing = false;
         this.cycle = 0;
         this.img = up;
     }
@@ -48,20 +50,27 @@ public class Turtles extends Actor implements ImageObserver {
 
     public void draw(Graphics2D g2d) {
         if (this.tramp) {
-            if (this.available) {
+            if (!this.decreassing)
+                this.cycle++;
+            else 
+                this.cycle--;
+
+            // posicion de las tortugas
+            if (this.cycle == 0) {
                 this.img = up;
+                this.decreassing = false;
                 this.property = new String("dynamic");
             }
-            else {
+            if (this.cycle == 15) {
                 this.img = mid;
+                this.property = new String("dynamic");
+            }
+            else if (this.cycle == 30) {
+                this.img = down;
                 this.property = new String("enemy");
+                this.decreassing = true;
             }
 
-            this.cycle++;
-            if (this.cycle == 30) {
-                this.available = !this.available;
-                this.cycle = 0;
-            }
         }                
         for (int i = this.x; i < this.x + this.width; i += this.height)
             g2d.drawImage(this.img, i, this.y, this);

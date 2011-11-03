@@ -35,6 +35,7 @@ public class frogger extends JPanel
     private int goals;      // metas que ha logrado
     private int bonusTime;  // timepo de reaparicion del bonus    
     private Death d;
+    private boolean filter;
     private Font font;
     private Timer timer;
     private Image img = new ImageIcon("img/Cover.png").getImage();
@@ -74,7 +75,7 @@ public class frogger extends JPanel
         this.froggy = new Frog(12, 9, 25);
 
         // agrega a el jugador y actores al tablero
-        this.level.addPlayer(this.froggy);
+        this.level.addPlayer(this.froggy);      
 
         for (int i = 0; i < 25; i += 6) {
             level.addActor(new Racer(7, i, 25, 1, 3 + speed, "red"));
@@ -230,11 +231,18 @@ public class frogger extends JPanel
         this.level.draw(g2d);   // dibuja todos los elementos de mapa
         this.infoScreen(g2d);
         this.d.draw(g2d);       // dibuja la imagen de muerte
+    
+        // filtro
+        if (this.filter) {
+            //g2d.setColor(new Color(0, 0, 100, 134));
+            g2d.setColor(new Color(0, 0, 0, 134));
+            g2d.fillRect(0, 0, 710, 13*25);
+        }
 
         if (!this.timer.isRunning()) {
             // dibuja la pantalla de presentacion
             g2d.drawImage(this.img, 0, 0, this);
-        }
+        }       
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -301,11 +309,16 @@ public class frogger extends JPanel
             if (!timer.isRunning())
                 timer.start();
 
+            if (e.getKeyCode() == KeyEvent.VK_F)
+                filter = !filter;
+
             froggy.keyPressed(e);
+            //System.out.println("p");
         }
 
 	public void keyReleased(KeyEvent e) {
             froggy.keyReleased(e);
+            //System.out.println("r");
 	}
     }              
 

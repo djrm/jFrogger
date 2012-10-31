@@ -6,13 +6,14 @@
 
 \documentclass[letter, 12pt] {article} 
 
-\usepackage[spanish] {babel}           
-\usepackage[utf8] {inputenc}           
-\usepackage[T1] {fontenc}              
-\usepackage {sans}
-\usepackage {multicol}
-\usepackage {wrapfig}
-\usepackage[pdftex] {graphicx} 
+% inclusion de paquetes
+\usepackage[spanish] {babel}
+\usepackage[utf8] {inputenc}
+\usepackage[T1] {fontenc}
+\usepackage {sans}   % usa la fuente sans
+\usepackage {multicol}  % usa el paquete para multicol
+\usepackage {wrapfig}  % se usa para las imagenes con texto alrededor
+\usepackage[pdftex] {graphicx}  % para poder usar imagenes
 
 
 \begin {document}
@@ -20,21 +21,23 @@
 % pagina de titulo
 \begin {titlepage}
   \begin {center}
+    % incluye una imagen de 150 px de ancho en la ruta img/Icon.png
+    % y despues salta .7 cm
     \includegraphics[width=150px] {./img/Icon.png} \\[.7cm]
-    { \Huge \bfseries Frogger } \\[.4cm]
+    { \Huge \bfseries Frogger } \\[.4cm]  %titulo en negritas Enorme
     \Large Daniel Ramirez Martinez \\[.2cm]
     \large \today
   \end {center}
 \end {titlepage}
 
 % introduccion
-\section* {Introducción}
+\section* {Introducción} % incia una seccion sin numeracion
 Implementación mediocre hecha en Java del juego 'Frogger' de Konami 
 para Atari 2600. \\[1cm]
 
 
-\section* {Implementación}
-\subsection* {Mapa}
+\section* {Implementación}  % otra seccion sin numeracion
+\subsection* {Mapa} % una subseccion 
 El juego consta de un entorno, que a su vez esta compuesto por un
 montón de elementos que decienden de la superclase abstracta
 'MapElement'.\\
@@ -46,19 +49,22 @@ Los actores (clase 'Actors') es una subclase abstracta de 'MapElement'
 que determina a los elementos dinamicos del mapa.\\
 
 A continuación se muestra el diagrama de clases.
-\begin {center}
+\begin {center}  %inicia centrado
+  % carga una imagen en pdf 
   \includegraphics[width=350px]{./img/MapElements-UML.pdf}\\[1cm]
 \end {center}
 
 El orden jerarquico de los elementos del entorno esta dado 
 en orden ascendente como sigue:
 
+% inicia una lista no ordenada
 \begin {itemize}
   \item Terreno
   \item Actores
   \item Jugador
 \end {itemize}
 
+% comienza una imagen con texto al rededor
 \begin {wrapfigure} {l} {8cm}
   \includegraphics[width=200px]{./img/layer-model.pdf}\\[.5cm]
 \end {wrapfigure}
@@ -81,7 +87,7 @@ el movimiento. Por otro caso cuando el jugador esta sobre un actor
 el movimiento de la rana ya no es exacto, ya que los actores son
 capaces de moverse libremente.\\
 
-\newpage
+\newpage   % salto de pagina
 
 La función de chequeo de colisión en la clase 'Map' verifica si
 el arreglo de actores tiene una lista en la posición correspondiente 

@@ -18,7 +18,7 @@ public class Turtles extends Actor implements ImageObserver {
     private Image img;
     private int cycle;
     private boolean decreassing;
-    private boolean tramp;      // 'true' si se oculta
+    private boolean trap;      // 'true' si se oculta
 
     private static Image up = 
         new ImageIcon("img/TurtleUp.png").getImage();
@@ -29,7 +29,7 @@ public class Turtles extends Actor implements ImageObserver {
 
 
     public Turtles(int y, int x, int side, int turtles, int direction,
-                   int speed, boolean tramp) {
+                   int speed, boolean trap) {
 
         this.x = x * side;
         this.y = y * side;
@@ -38,7 +38,7 @@ public class Turtles extends Actor implements ImageObserver {
         this.direction = direction;
         this.speed = speed;
         this.property = new String("dynamic");
-        this.tramp = tramp;
+        this.trap = trap;
         this.decreassing = false;
         this.cycle = 0;
         this.img = up;
@@ -49,7 +49,7 @@ public class Turtles extends Actor implements ImageObserver {
     /*  --M E T O D O S--  */
 
     public void draw(Graphics2D g2d) {
-        if (this.tramp) {
+        if (this.trap) {
             if (!this.decreassing)
                 this.cycle++;
             else 
